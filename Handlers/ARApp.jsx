@@ -23,8 +23,8 @@ import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
 import { RotateHandlers } from "./RotateHandlers";
 
-export let realityMode = "AR";
-// export let realityMode = "VR";
+// export let realityMode = "AR";
+export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {

@@ -12,8 +12,8 @@ export function EnhancedRayGrab({
 }) {
 	const controller1Ref = useRef();
 	const controller2Ref = useRef();
-    // both hands are still operating (pinching/intersecting with the object)
-    let bothHands = useRef(false);
+	// both hands are still operating (pinching/intersecting with the object)
+	let bothHands = useRef(false);
 
 	const initialDistance = useRef(0);
 	const previousTransform = useMemo(() => new Matrix4(), []);
@@ -41,7 +41,7 @@ export function EnhancedRayGrab({
 				// );
 			} else if (controller1 && controller2) {
 				// Handle scaling for two controllers
-                bothHands.current = true;
+				bothHands.current = true;
 				const currentDistance = controller1.position.distanceTo(
 					controller2.position
 				);
@@ -72,23 +72,6 @@ export function EnhancedRayGrab({
 		console.log("hard", intersectedObj.current.name);
 		if (intersectedObj.current.name === "bbox") {
 			globals.moveMode = "bbox";
-		} else if (
-			(intersectedObj.current.name === "rotateHandler0" ||
-				intersectedObj.current.name === "rotateHandler1" ||
-				intersectedObj.current.name === "rotateHandler2" ||
-				intersectedObj.current.name === "rotateHandler3" ||
-				intersectedObj.current.name === "rotateHandler4" ||
-				intersectedObj.current.name === "rotateHandler5" ||
-				intersectedObj.current.name === "rotateHandler6" ||
-				intersectedObj.current.name === "rotateHandler7" ||
-				intersectedObj.current.name === "rotateHandler8" ||
-				intersectedObj.current.name === "rotateHandler9" ||
-				intersectedObj.current.name === "rotateHandler10" ||
-				intersectedObj.current.name === "rotateHandler11") &&
-			globals.moveMode !== "insideBbox"
-		) {
-			// console.log("hihihihi");
-			globals.moveMode = "holdingRotateHandler";
 		}
 		console.log("handleSelectStart");
 		if (
@@ -139,7 +122,7 @@ export function EnhancedRayGrab({
 			console.log("handleSelectEnd", controller.controller);
 			if (controller1Ref.current === controller.controller) {
 				controller1Ref.current = undefined;
-                bothHands.current = false;
+				bothHands.current = false;
 				if (controller2Ref.current) {
 					previousTransform.copy(controller2Ref.current.matrixWorld).invert();
 					//TODO: need to set globals.handIndex here;
@@ -148,7 +131,7 @@ export function EnhancedRayGrab({
 				}
 			} else if (controller2Ref.current === controller.controller) {
 				controller2Ref.current = undefined;
-                bothHands.current = false;
+				bothHands.current = false;
 				if (controller1Ref.current) {
 					previousTransform.copy(controller1Ref.current.matrixWorld).invert();
 					//TODO: need to set globals.handIndex here;
@@ -188,7 +171,7 @@ export function EnhancedRayGrab({
 							console.log("handleSelectEnd", controllers[0]);
 							if (controller1Ref.current === controllers[0].controller) {
 								controller1Ref.current = undefined;
-                                bothHands.current = false;
+								bothHands.current = false;
 								console.log("hooo");
 								if (controller2Ref.current) {
 									console.log("haaa");
@@ -202,7 +185,7 @@ export function EnhancedRayGrab({
 								}
 							} else if (controller2Ref.current === controllers[0].controller) {
 								controller2Ref.current = undefined;
-                                bothHands.current = false;
+								bothHands.current = false;
 								if (controller1Ref.current) {
 									previousTransform
 										.copy(controller1Ref.current.matrixWorld)
@@ -233,7 +216,7 @@ export function EnhancedRayGrab({
 							console.log("handleSelectEnd", controllers[1]);
 							if (controller1Ref.current === controllers[1].controller) {
 								controller1Ref.current = undefined;
-                                bothHands.current = false;
+								bothHands.current = false;
 								console.log("hooo 11");
 								if (controller2Ref.current) {
 									console.log("haaa 11");
@@ -246,7 +229,7 @@ export function EnhancedRayGrab({
 								}
 							} else if (controller2Ref.current === controllers[1].controller) {
 								controller2Ref.current = undefined;
-                                bothHands.current = false;
+								bothHands.current = false;
 								if (controller1Ref.current) {
 									previousTransform
 										.copy(controller1Ref.current.matrixWorld)

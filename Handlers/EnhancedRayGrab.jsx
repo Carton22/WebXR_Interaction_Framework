@@ -1,6 +1,6 @@
 import { useRef, useMemo } from "react";
 import { Object3D, Matrix4, Vector3, Quaternion } from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Interactive, useXR } from "@react-three/xr";
 import { globals } from "./ARApp";
 
@@ -15,7 +15,7 @@ function calculateAxis(startPoint, endPoint) {
 		endPoint.matrixWorld.elements[13],
 		endPoint.matrixWorld.elements[14]
 	);
-	const axis = new Vector3().subVectors(end, start).normalize();
+	const axis = new Vector3().subVectors(start, end).normalize();
 	return axis;
 }
 
@@ -27,7 +27,8 @@ export function EnhancedRayGrab({
 }) {
 	const controller1Ref = useRef();
 	const controller2Ref = useRef();
-    let bothHands = useRef(false);
+	let bothHands = useRef(false);
+	const { scene } = useThree();
 
 	const initialDistance = useRef(0);
 	const previousTransform = useMemo(() => new Matrix4(), []);
@@ -76,22 +77,19 @@ export function EnhancedRayGrab({
 					return;
 				}
 				deltaController.subVectors(controller1.position, previousControllerPos);
-				console.log("ggggg", obj.parent.parent.children);
+				console.log("ggggg", obj.parent);
 				const rotationSpeed = 3;
-				let Xaxis = calculateAxis(
-					obj.parent.parent.children[1],
-					obj.parent.parent.children[2]
-				);
+				let startPointX = scene.getObjectByName("startPointX");
+				let endPointX = scene.getObjectByName("endPointX");
+				let Xaxis = calculateAxis(startPointX, endPointX);
 				console.log("Xaxis", Xaxis);
-				let Yaxis = calculateAxis(
-					obj.parent.parent.children[3],
-					obj.parent.parent.children[4]
-				);
+				let startPointY = scene.getObjectByName("startPointY");
+				let endPointY = scene.getObjectByName("endPointY");
+				let Yaxis = calculateAxis(startPointY, endPointY);
 				console.log("Yaxis", Yaxis);
-				let Zaxis = calculateAxis(
-					obj.parent.parent.children[5],
-					obj.parent.parent.children[6]
-				);
+				let startPointZ = scene.getObjectByName("startPointZ");
+				let endPointZ = scene.getObjectByName("endPointZ");
+				let Zaxis = calculateAxis(startPointZ, endPointZ);
 				console.log("Zaxis", Zaxis);
 				if (
 					obj.name === "rotateHandler0" ||
@@ -102,7 +100,7 @@ export function EnhancedRayGrab({
 					if (deltaController.y > 0) {
 						rotateAxis.copy(Xaxis);
 					} else {
-						rotateAxis.copy(Xaxis);
+						rotateAxis.copy(Xaxis.clone().negate());
 					}
 				} else if (
 					obj.name === "rotateHandler4" ||
@@ -113,7 +111,7 @@ export function EnhancedRayGrab({
 					if (deltaController.x > 0) {
 						rotateAxis.copy(Yaxis);
 					} else {
-						rotateAxis.copy(Yaxis);
+						rotateAxis.copy(Yaxis.clone().negate());
 					}
 				} else if (
 					obj.name === "rotateHandler8" ||
@@ -124,13 +122,14 @@ export function EnhancedRayGrab({
 					if (deltaController.z > 0) {
 						rotateAxis.copy(Zaxis);
 					} else {
-						rotateAxis.copy(Zaxis);
+						rotateAxis.copy(Zaxis.clone().negate());
 					}
 				}
 
 				let angle = deltaController.length() * rotationSpeed;
 				let quaternion = new Quaternion().setFromAxisAngle(rotateAxis, angle);
-				obj.parent.parent.applyQuaternion(quaternion);
+				let bbox = scene.getObjectByName("bbox");
+				bbox.applyQuaternion(quaternion);
 				previousControllerPos.copy(controller1.position);
 			}
 		}
@@ -219,7 +218,7 @@ export function EnhancedRayGrab({
 			console.log("handleSelectEnd", controller.controller);
 			if (controller1Ref.current === controller.controller) {
 				controller1Ref.current = undefined;
-                bothHands.current = false;
+				bothHands.current = false;
 				if (controller2Ref.current) {
 					previousTransform.copy(controller2Ref.current.matrixWorld).invert();
 					//TODO: need to set globals.handIndex here;
@@ -228,7 +227,7 @@ export function EnhancedRayGrab({
 				}
 			} else if (controller2Ref.current === controller.controller) {
 				controller2Ref.current = undefined;
-                bothHands.current = false;
+				bothHands.current = false;
 				if (controller1Ref.current) {
 					previousTransform.copy(controller1Ref.current.matrixWorld).invert();
 					//TODO: need to set globals.handIndex here;
@@ -351,7 +350,6 @@ export function EnhancedRayGrab({
 	return (
 		<Interactive
 			onSelectStart={handleSelectStart}
-			onBlur={handleSelectEnd}
 			onSelectEnd={handleSelectEnd}
 			{...rest}
 		>
