@@ -23,6 +23,7 @@ import { EnhancedRayGrab } from "./EnhancedRayGrab";
 
 // export let realityMode = "AR";
 export let realityMode = "VR";
+export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {
 	const { controllers } = useXR();
@@ -69,7 +70,7 @@ export default function App() {
 					<Controllers />
 					<Hands />
 					<EnhancedRayGrab>
-						<mesh position={[0, 1.5, -2]} scale={objScale}>
+						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 							<boxGeometry args={boxLength} />
 							<meshStandardMaterial color="skyblue" transparent opacity={0.8} />
 							<AxisPoints objScale={objScale} boxLength={boxLength} />

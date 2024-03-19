@@ -1,8 +1,23 @@
 import { useRef, useMemo } from "react";
-import { Object3D, Matrix4, Vector3 } from "three";
+import { Object3D, Matrix4, Vector3, Quaternion } from "three";
 import { useFrame } from "@react-three/fiber";
 import { Interactive, useXR } from "@react-three/xr";
 import { globals } from "./ARApp";
+
+function calculateAxis(startPoint, endPoint) {
+	let start = new Vector3(
+		startPoint.matrixWorld.elements[12],
+		startPoint.matrixWorld.elements[13],
+		startPoint.matrixWorld.elements[14]
+	);
+	let end = new Vector3(
+		endPoint.matrixWorld.elements[12],
+		endPoint.matrixWorld.elements[13],
+		endPoint.matrixWorld.elements[14]
+	);
+	const axis = new Vector3().subVectors(end, start).normalize();
+	return axis;
+}
 
 export function EnhancedRayGrab({
 	onSelectStart,
@@ -12,36 +27,34 @@ export function EnhancedRayGrab({
 }) {
 	const controller1Ref = useRef();
 	const controller2Ref = useRef();
-    // both hands are still operating (pinching/intersecting with the object)
     let bothHands = useRef(false);
 
 	const initialDistance = useRef(0);
 	const previousTransform = useMemo(() => new Matrix4(), []);
 
+	// for rotate handlers
+	// rotate the object
+	let deltaController = new Vector3();
+	let previousControllerPos = new Vector3();
+	let rotateAxis = new Vector3(1, 0, 0);
+
 	useFrame(() => {
 		const controller1 = controller1Ref.current;
 		const controller2 = controller2Ref.current;
-		// console.log("mode", globals.moveMode);
+
 		const obj = intersectedObj.current;
-		// console.log("gg",obj);
 		if (!obj) return;
 		if (!controller1) return;
 
 		if (globals.moveMode == "bbox") {
-			if (controller1 && !controller2 && !bothHands.current) {
-				console.log("ccc", controller1.matrixWorld);
+			if (controller1 && !controller2) {
 				// Handle translation and rotation for single controller
 				obj.applyMatrix4(previousTransform);
 				obj.applyMatrix4(controller1.matrixWorld);
 				obj.updateMatrixWorld();
 				previousTransform.copy(controller1.matrixWorld).invert();
-
-				// let quaternion = new Quaternion().setFromRotationMatrix(
-				// 	previousTransform.multiply(controller1.matrixWorld)
-				// );
 			} else if (controller1 && controller2) {
 				// Handle scaling for two controllers
-                bothHands.current = true;
 				const currentDistance = controller1.position.distanceTo(
 					controller2.position
 				);
@@ -55,10 +68,77 @@ export function EnhancedRayGrab({
 				obj.scale.multiplyScalar(scale);
 			}
 		}
+
+		if (globals.moveMode == "holdingRotateHandler") {
+			if (controller1) {
+				if (previousControllerPos.lengthSq() === 0) {
+					previousControllerPos.copy(controller1.position);
+					return;
+				}
+				deltaController.subVectors(controller1.position, previousControllerPos);
+				console.log("ggggg", obj.parent.parent.children);
+				const rotationSpeed = 3;
+				let Xaxis = calculateAxis(
+					obj.parent.parent.children[1],
+					obj.parent.parent.children[2]
+				);
+				console.log("Xaxis", Xaxis);
+				let Yaxis = calculateAxis(
+					obj.parent.parent.children[3],
+					obj.parent.parent.children[4]
+				);
+				console.log("Yaxis", Yaxis);
+				let Zaxis = calculateAxis(
+					obj.parent.parent.children[5],
+					obj.parent.parent.children[6]
+				);
+				console.log("Zaxis", Zaxis);
+				if (
+					obj.name === "rotateHandler0" ||
+					obj.name === "rotateHandler1" ||
+					obj.name === "rotateHandler2" ||
+					obj.name === "rotateHandler3"
+				) {
+					if (deltaController.y > 0) {
+						rotateAxis.copy(Xaxis);
+					} else {
+						rotateAxis.copy(Xaxis);
+					}
+				} else if (
+					obj.name === "rotateHandler4" ||
+					obj.name === "rotateHandler5" ||
+					obj.name === "rotateHandler6" ||
+					obj.name === "rotateHandler7"
+				) {
+					if (deltaController.x > 0) {
+						rotateAxis.copy(Yaxis);
+					} else {
+						rotateAxis.copy(Yaxis);
+					}
+				} else if (
+					obj.name === "rotateHandler8" ||
+					obj.name === "rotateHandler9" ||
+					obj.name === "rotateHandler10" ||
+					obj.name === "rotateHandler11"
+				) {
+					if (deltaController.z > 0) {
+						rotateAxis.copy(Zaxis);
+					} else {
+						rotateAxis.copy(Zaxis);
+					}
+				}
+
+				let angle = deltaController.length() * rotationSpeed;
+				let quaternion = new Quaternion().setFromAxisAngle(rotateAxis, angle);
+				obj.parent.parent.applyQuaternion(quaternion);
+				previousControllerPos.copy(controller1.position);
+			}
+		}
 	});
 
 	const intersectedObj = useRef();
 	const initialScale = useRef();
+
 	const handleSelectStart = (e) => {
 		intersectedObj.current = e.intersection?.object;
 		console.log(
@@ -188,7 +268,6 @@ export function EnhancedRayGrab({
 							console.log("handleSelectEnd", controllers[0]);
 							if (controller1Ref.current === controllers[0].controller) {
 								controller1Ref.current = undefined;
-                                bothHands.current = false;
 								console.log("hooo");
 								if (controller2Ref.current) {
 									console.log("haaa");
@@ -202,7 +281,6 @@ export function EnhancedRayGrab({
 								}
 							} else if (controller2Ref.current === controllers[0].controller) {
 								controller2Ref.current = undefined;
-                                bothHands.current = false;
 								if (controller1Ref.current) {
 									previousTransform
 										.copy(controller1Ref.current.matrixWorld)
@@ -233,7 +311,6 @@ export function EnhancedRayGrab({
 							console.log("handleSelectEnd", controllers[1]);
 							if (controller1Ref.current === controllers[1].controller) {
 								controller1Ref.current = undefined;
-                                bothHands.current = false;
 								console.log("hooo 11");
 								if (controller2Ref.current) {
 									console.log("haaa 11");
@@ -246,7 +323,6 @@ export function EnhancedRayGrab({
 								}
 							} else if (controller2Ref.current === controllers[1].controller) {
 								controller2Ref.current = undefined;
-                                bothHands.current = false;
 								if (controller1Ref.current) {
 									previousTransform
 										.copy(controller1Ref.current.matrixWorld)
@@ -275,11 +351,12 @@ export function EnhancedRayGrab({
 	return (
 		<Interactive
 			onSelectStart={handleSelectStart}
+			onBlur={handleSelectEnd}
 			onSelectEnd={handleSelectEnd}
 			{...rest}
 		>
-			{children}
 			<ReleaseSelectEndHandler />
+			{children}
 		</Interactive>
 	);
 }
