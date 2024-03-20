@@ -33,7 +33,7 @@ export function EnhancedRayGrab({
 		const obj = intersectedObj.current;
 		if (!obj) return;
 		if (!controller1) return;
-		if (globals.moveMode == "bbox") {
+		if (globals.moveMode == "bbox" || globals.moveMode == "bindhand") {
 			if (controller1 && !controller2) {
 				// Handle translation and rotation for single controller
 				obj.applyMatrix4(previousTransform);
@@ -41,20 +41,6 @@ export function EnhancedRayGrab({
 				obj.updateMatrixWorld();
 				previousTransform.copy(controller1.matrixWorld).invert();
 			}
-			//  else if (controller1 && controller2) {
-			// 	// Handle scaling for two controllers
-			// 	const currentDistance = controller1.position.distanceTo(
-			// 		controller2.position
-			// 	);
-			// 	if (initialDistance.current === 0) {
-			// 		initialDistance.current = currentDistance;
-			// 	}
-
-			// 	const scale = currentDistance / initialDistance.current;
-			// 	const initScale = initialScale.current;
-			// 	obj.scale.set(initScale.x, initScale.y, initScale.z);
-			// 	obj.scale.multiplyScalar(scale);
-			// }
 		}
 
 		if (globals.moveMode == "freecontrol") {
@@ -107,13 +93,14 @@ export function EnhancedRayGrab({
 		console.log("hard", intersectedObj.current.name);
 		if (
 			intersectedObj.current.name === "bbox" &&
-			globals.moveMode !== "freecontrol"
+			globals.moveMode !== "freecontrol" &&
+			globals.moveMode !== "bindhand"
 		) {
 			globals.moveMode = "bbox";
 		}
 
 		console.log("handleSelectStart");
-		if (globals.moveMode == "bbox" || globals.moveMode == "freecontrol") {
+		if (globals.moveMode == "bbox") {
 			const controller = e.target;
 			// Determine if it's the first or second controller
 			if (controller1Ref.current === undefined) {
@@ -142,7 +129,7 @@ export function EnhancedRayGrab({
 	};
 
 	const handleSelectEnd = (e) => {
-		if (globals.moveMode == "bbox" || "freecontrol") {
+		if (globals.moveMode == "bbox") {
 			const controller = e.target;
 			console.log("handleSelectEnd", controller.controller);
 			if (controller1Ref.current === controller.controller) {
@@ -181,7 +168,10 @@ export function EnhancedRayGrab({
 		const { scene } = useThree();
 		useFrame(() => {
 			if (controllers && controllers[0] && controllers[1]) {
-				if (globals.moveMode == "freecontrol") {
+				if (
+					globals.moveMode == "freecontrol" ||
+					globals.moveMode == "bindhand"
+				) {
 					if (controllers[0].hand) {
 						if (controllers[0].hand.inputState.pinching == true) {
 							intersectedObj.current = scene.getObjectByName("bbox");
@@ -217,7 +207,6 @@ export function EnhancedRayGrab({
 							console.log("free handleSelectStart", controllers[1]);
 							if (controller1Ref.current == undefined) {
 								globals.handIndex = 1;
-								console.log("wwweird");
 								controller1Ref.current = controllers[1].controller;
 								previousTransform
 									.copy(controller1Ref.current.matrixWorld)
@@ -250,6 +239,7 @@ export function EnhancedRayGrab({
 			if (controllers && controllers[0] && controllers[1]) {
 				if (
 					globals.moveMode == "freecontrol" ||
+					globals.moveMode == "bindhand" ||
 					globals.moveMode == "bbox"
 				) {
 					if (controllers[0].hand) {
@@ -352,11 +342,11 @@ export function EnhancedRayGrab({
 				<ReleaseSelectEndHandler />
 				{children}
 			</Interactive>
-			{/* <Center bottom right position={[0, 2, -1]}>
+			<Center bottom right position={[0, 2, -1]}>
 				<Text name="result" color="gray" scale={0.05}>
 					{`${t}`}
 				</Text>
-			</Center> */}
+			</Center>
 		</>
 	);
 }

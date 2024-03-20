@@ -9,10 +9,13 @@ export const HandBbox = () => {
 	const { scene } = useThree();
 	const rightTipRef = useRef();
 	const leftTipRef = useRef();
+	const rightMiddleTipRef = useRef();
 	let leftTipBB = useState();
 	let rightTipBB = useState();
+	let rightMiddleTipBB = useState();
 	let bboxBB = useState();
 	let [lastIntersect, setLastIntersect] = useState(false);
+	let [lastMiddleIntersect, setLastMiddleIntersect] = useState(false);
 
 	useFrame(() => {
 		if (controllers && controllers[0] && controllers[1]) {
@@ -20,6 +23,9 @@ export const HandBbox = () => {
 				const rightTipPosition =
 					controllers[0].hand.joints["index-finger-tip"].position;
 				rightTipRef.current.position.copy(rightTipPosition);
+				const rightMiddleTipPosition =
+					controllers[0].hand.joints["pinky-finger-tip"].position;
+				rightMiddleTipRef.current.position.copy(rightMiddleTipPosition);
 			}
 			if (controllers[1].controller) {
 				const leftTipPosition =
@@ -33,9 +39,12 @@ export const HandBbox = () => {
 			// console.log("leftTipBbox", leftTipBbox);
 			let bbox = scene.getObjectByName("bbox");
 
+			let rightMiddleTipBbox = scene.getObjectByName("rightMiddleTipBbox")
 			leftTipBB = new Box3().setFromObject(leftTipBbox);
 
 			rightTipBB = new Box3().setFromObject(rightTipBbox);
+
+			rightMiddleTipBB = new Box3().setFromObject(rightMiddleTipBbox);
 
 			bboxBB = new Box3().setFromObject(bbox);
 
@@ -67,13 +76,30 @@ export const HandBbox = () => {
 			}
 
 			if (
-				(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB)) &&
-				globals.moveMode !== "measuring" &&
-				globals.moveMode !== "selecting"
+				leftTipBB.intersectsBox(rightMiddleTipBB)
 			) {
-				globals.moveMode = "insideBbox";
-				console.log("xxx", globals.moveMode);
+				if (lastMiddleIntersect === false) {
+					setLastMiddleIntersect(true);
+					if (globals.moveMode === "bindhand") {
+						globals.moveMode = "off";
+						console.log("cancel mode bindhand");
+					} else {
+						globals.moveMode = "bindhand";
+						console.log("set mode bindhand");
+					}
+				}
+			} else {
+				setLastMiddleIntersect(false);
 			}
+
+			// if (
+			// 	(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB)) &&
+			// 	globals.moveMode !== "measuring" &&
+			// 	globals.moveMode !== "selecting"
+			// ) {
+			// 	globals.moveMode = "insideBbox";
+			// 	console.log("xxx", globals.moveMode);
+			// }
 		}
 	});
 
@@ -86,6 +112,10 @@ export const HandBbox = () => {
 			<mesh name="rightTipBbox" ref={rightTipRef}>
 				<boxGeometry args={[0.02, 0.02, 0.02]} />
 				<meshStandardMaterial color={"orange"} transparent opacity={1} />
+			</mesh>
+			<mesh name="rightMiddleTipBbox" ref={rightMiddleTipRef}>
+				<boxGeometry args={[0.02, 0.02, 0.02]} />
+				<meshStandardMaterial color={"red"} transparent opacity={1} />
 			</mesh>
 		</>
 	);
