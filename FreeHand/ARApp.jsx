@@ -21,10 +21,10 @@ import {
 import React from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
-import { RotateHandlers } from "./RotateHandlers";
+import { HandBbox } from "./HandBbox";
 
-// export let realityMode = "AR";
-export let realityMode = "VR";
+export let realityMode = "AR";
+// export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {
@@ -92,9 +92,9 @@ export default function App() {
 							<boxGeometry args={boxLength} />
 							<meshStandardMaterial color="skyblue" transparent opacity={0.8} />
 							<AxisPoints objScale={objScale} boxLength={boxLength} />
-							<RotateHandlers objScale={objScale} boxLength={boxLength} />
 						</mesh>
 					</EnhancedRayGrab>
+					<HandBbox />
 					<HandDecorate />
 					<OrbitControls />
 					{realityMode == "VR" && (

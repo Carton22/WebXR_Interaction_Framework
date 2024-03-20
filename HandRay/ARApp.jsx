@@ -59,11 +59,26 @@ export default function App() {
 	const objScale = [1, 1, 1];
 	return (
 		<div id="ThreeJs" style={{ width: "100%", height: "100%" }}>
-			{realityMode == "VR" ? (
-				<VRButton sessionInit={{ optionalFeatures: ["hand-tracking"] }} />
-			) : (
-				<ARButton sessionInit={{ optionalFeatures: ["hand-tracking"] }} />
-			)}
+			<XRButton
+				mode={realityMode}
+				sessionInit={{ optionalFeatures: ["hand-tracking"] }}
+				style={{
+					backgroundColor: "#007bff",
+					color: "#fff",
+					border: "none",
+					padding: "15px 25px",
+					borderRadius: "8px",
+					cursor: "pointer",
+					fontWeight: "bold",
+					boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+					scale: "2",
+					position: "absolute",
+					bottom: "10%",
+					left: "52%",
+					transform: "translateX(-50%)",
+					zIndex: 1,
+				}}
+			/>
 			<Canvas camera={{ position: [0, 3, 2], rotation: [0, 0, 0] }}>
 				<XR>
 					{lights}

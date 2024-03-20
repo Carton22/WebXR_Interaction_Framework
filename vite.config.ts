@@ -10,7 +10,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
-        freeControl: "freeControl.html"
+        handlers: "handlers.html",
+        freehand: "freehand.html"
       },
     },
   },
