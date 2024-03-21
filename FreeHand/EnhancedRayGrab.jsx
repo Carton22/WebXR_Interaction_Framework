@@ -33,13 +33,25 @@ export function EnhancedRayGrab({
 		const obj = intersectedObj.current;
 		if (!obj) return;
 		if (!controller1) return;
-		if (globals.moveMode == "bbox" || globals.moveMode == "bindhand") {
+		if (globals.moveMode == "bbox" || globals.moveMode == "bindhand" || globals.moveMode == "insideBbox") {
 			if (controller1 && !controller2) {
 				// Handle translation and rotation for single controller
 				obj.applyMatrix4(previousTransform);
 				obj.applyMatrix4(controller1.matrixWorld);
 				obj.updateMatrixWorld();
 				previousTransform.copy(controller1.matrixWorld).invert();
+			} else if (controller1 && controller2 && globals.moveMode == "insideBbox") {
+				// Handle scaling for two controllers
+				const currentDistance = controller1.position.distanceTo(
+					controller2.position
+				);
+				if (initialDistance.current === 0) {
+					initialDistance.current = currentDistance;
+				}
+				const scale = currentDistance / initialDistance.current;
+				const initScale = initialScale.current;
+				obj.scale.set(initScale.x, initScale.y, initScale.z);
+				obj.scale.multiplyScalar(scale);
 			}
 		}
 
@@ -170,7 +182,8 @@ export function EnhancedRayGrab({
 			if (controllers && controllers[0] && controllers[1]) {
 				if (
 					globals.moveMode == "freecontrol" ||
-					globals.moveMode == "bindhand"
+					globals.moveMode == "bindhand" ||
+					globals.moveMode == "insideBbox"
 				) {
 					if (controllers[0].hand) {
 						if (controllers[0].hand.inputState.pinching == true) {
@@ -240,6 +253,7 @@ export function EnhancedRayGrab({
 				if (
 					globals.moveMode == "freecontrol" ||
 					globals.moveMode == "bindhand" ||
+					globals.moveMode == "insideBbox" ||
 					globals.moveMode == "bbox"
 				) {
 					if (controllers[0].hand) {

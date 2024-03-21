@@ -49,15 +49,6 @@ export const HandBbox = () => {
 			bboxBB = new Box3().setFromObject(bbox);
 
 			if (
-				!(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB))
-			) {
-				if (globals.moveMode === "insideBbox") {
-					globals.moveMode = "off";
-					console.log("here off 3");
-				}
-			}
-
-			if (
 				leftTipBB.intersectsBox(rightTipBB) &&
 				leftTipBB.max.x !== -rightTipBB.min.x
 			) {
@@ -92,14 +83,23 @@ export const HandBbox = () => {
 				setLastMiddleIntersect(false);
 			}
 
-			// if (
-			// 	(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB)) &&
-			// 	globals.moveMode !== "measuring" &&
-			// 	globals.moveMode !== "selecting"
-			// ) {
-			// 	globals.moveMode = "insideBbox";
-			// 	console.log("xxx", globals.moveMode);
-			// }
+			if (
+				(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB)) &&
+				globals.moveMode !== "freecontrol" &&
+				globals.moveMode !== "bindhand"
+			) {
+				globals.moveMode = "insideBbox";
+				console.log("xxx", globals.moveMode);
+			}
+
+			if (
+				!(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB))
+			) {
+				if (globals.moveMode === "insideBbox") {
+					globals.moveMode = "off";
+					console.log("here off 3");
+				}
+			}
 		}
 	});
 
