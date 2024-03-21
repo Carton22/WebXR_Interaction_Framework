@@ -23,6 +23,7 @@ export function EnhancedRayGrab({
 	// rotate the object
 	let deltaController = new Vector3();
 	let previousControllerPos = new Vector3();
+	let previousControllerQuaternion = new Quaternion();
 	let [t, setT] = useState("");
 
 	useFrame(() => {
@@ -33,14 +34,42 @@ export function EnhancedRayGrab({
 		const obj = intersectedObj.current;
 		if (!obj) return;
 		if (!controller1) return;
-		if (globals.moveMode == "bbox" || globals.moveMode == "bindhand" || globals.moveMode == "insideBbox") {
+		if (
+			globals.moveMode == "bbox" ||
+			globals.moveMode == "bindhand" ||
+			globals.moveMode == "insideBbox"
+		) {
 			if (controller1 && !controller2) {
-				// Handle translation and rotation for single controller
-				obj.applyMatrix4(previousTransform);
-				obj.applyMatrix4(controller1.matrixWorld);
-				obj.updateMatrixWorld();
-				previousTransform.copy(controller1.matrixWorld).invert();
-			} else if (controller1 && controller2 && globals.moveMode == "insideBbox") {
+				if (globals.moveMode == "bbox") {
+					// Handle translation and rotation for single controller
+					obj.applyMatrix4(previousTransform);
+					obj.applyMatrix4(controller1.matrixWorld);
+					obj.updateMatrixWorld();
+					previousTransform.copy(controller1.matrixWorld).invert();
+				} else if (globals.moveMode == "bindhand") {
+					// Get the current quaternion of the controller
+					const currentControllerQuaternion = controller1.quaternion;
+
+					// Calculate the change in rotation since the last frame
+					const deltaRotationQuaternion = new Quaternion();
+					deltaRotationQuaternion
+						.copy(currentControllerQuaternion)
+						.multiply(previousControllerQuaternion.invert());
+
+					// Apply the change in rotation to the object
+					obj.applyQuaternion(deltaRotationQuaternion);
+
+					// Update the previous controller quaternion for the next frame
+					previousControllerQuaternion.copy(currentControllerQuaternion);
+
+					// Update the world matrix of the object
+					obj.updateMatrixWorld();
+				}
+			} else if (
+				controller1 &&
+				controller2 &&
+				globals.moveMode == "insideBbox"
+			) {
 				// Handle scaling for two controllers
 				const currentDistance = controller1.position.distanceTo(
 					controller2.position
@@ -198,6 +227,7 @@ export function EnhancedRayGrab({
 									.copy(controller1Ref.current.matrixWorld)
 									.invert();
 								previousControllerPos.copy(controller1Ref.current.position);
+								previousControllerQuaternion.copy(controller1Ref.current.quaternion);
 							} else if (
 								controller2Ref.current == undefined &&
 								controller1Ref.current !== controllers[0].controller
@@ -225,6 +255,7 @@ export function EnhancedRayGrab({
 									.copy(controller1Ref.current.matrixWorld)
 									.invert();
 								previousControllerPos.copy(controller1Ref.current.position);
+								previousControllerQuaternion.copy(controller1Ref.current.quaternion);
 							} else if (
 								controller2Ref.current == undefined &&
 								controller1Ref.current !== controllers[1].controller
@@ -271,6 +302,7 @@ export function EnhancedRayGrab({
 										.copy(controller2Ref.current.matrixWorld)
 										.invert();
 									previousControllerPos.copy(controller2Ref.current.position);
+									previousControllerQuaternion.copy(controller2Ref.current.quaternion);
 									globals.handIndex = 1;
 									console.log("set 1 here 1");
 									controller1Ref.current = controller2Ref.current;
@@ -314,6 +346,7 @@ export function EnhancedRayGrab({
 										.copy(controller2Ref.current.matrixWorld)
 										.invert();
 									previousControllerPos.copy(controller2Ref.current.position);
+									previousControllerQuaternion.copy(controller2Ref.current.quaternion);
 									globals.handIndex = 0;
 									controller1Ref.current = controller2Ref.current;
 									controller2Ref.current = undefined;
