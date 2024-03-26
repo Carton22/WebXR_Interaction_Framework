@@ -22,6 +22,7 @@ import React from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
 import { HandBbox } from "./HandBbox";
+import { KeyboardControl } from "./KeyboardControl";
 
 // export let realityMode = "AR";
 export let realityMode = "VR";
@@ -87,12 +88,18 @@ export default function App() {
 					<Controllers />
 					<Hands />
 					<EnhancedRayGrab>
-						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
-							<Edges name="bboxEdges" color={"white"} />
-							<boxGeometry args={boxLength} />
-							<meshStandardMaterial color="skyblue" transparent opacity={0.8} />
-							<AxisPoints objScale={objScale} boxLength={boxLength} />
-						</mesh>
+						<KeyboardControl>
+							<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
+								<Edges name="bboxEdges" color={"white"} />
+								<boxGeometry args={boxLength} />
+								<meshStandardMaterial
+									color="skyblue"
+									transparent
+									opacity={0.8}
+								/>
+								<AxisPoints objScale={objScale} boxLength={boxLength} />
+							</mesh>
+						</KeyboardControl>
 					</EnhancedRayGrab>
 					<HandBbox />
 					<HandDecorate />
