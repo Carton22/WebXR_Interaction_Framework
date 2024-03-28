@@ -97,8 +97,9 @@ export function EnhancedRayGrab({
 				let normal = new Vector3()
 					.crossVectors(edge2, deltaController)
 					.normalize();
-				const rotationSpeed = 3;
-				let angle = deltaController.length() * rotationSpeed;
+				const rotationSpeed = 500;
+				let angle = deltaController.length() * deltaController.length() * rotationSpeed;
+				console.log("angle", deltaController.length());
 				let quaternion = new Quaternion().setFromAxisAngle(normal, angle);
 				bbox.applyQuaternion(quaternion);
 				previousControllerPos.copy(controller1.position);
