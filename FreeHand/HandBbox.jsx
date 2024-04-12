@@ -10,12 +10,15 @@ export const HandBbox = () => {
 	const rightTipRef = useRef();
 	const leftTipRef = useRef();
 	const rightMiddleTipRef = useRef();
+	const leftPinkyTipRef = useRef();
 	let leftTipBB = useState();
 	let rightTipBB = useState();
 	let rightMiddleTipBB = useState();
+	let leftPinkyTipBB = useState();
 	let bboxBB = useState();
 	let [lastIntersect, setLastIntersect] = useState(false);
 	let [lastMiddleIntersect, setLastMiddleIntersect] = useState(false);
+	let [lastPinkyIntersect, setLastPinkyIntersect] = useState(false);
 
 	useFrame(() => {
 		if (controllers && controllers[0] && controllers[1]) {
@@ -31,6 +34,9 @@ export const HandBbox = () => {
 				const leftTipPosition =
 					controllers[1].hand.joints["index-finger-tip"].position;
 				leftTipRef.current.position.copy(leftTipPosition);
+				const leftPinkyTipPosition =
+					controllers[1].hand.joints["pinky-finger-tip"].position;
+				leftPinkyTipRef.current.position.copy(leftPinkyTipPosition);
 			}
 			// console.log("scene", scene);
 			let rightTipBbox = scene.getObjectByName("rightTipBbox");
@@ -40,11 +46,15 @@ export const HandBbox = () => {
 			let bbox = scene.getObjectByName("bbox");
 
 			let rightMiddleTipBbox = scene.getObjectByName("rightMiddleTipBbox")
+			let leftPinkyTipBbox = scene.getObjectByName("leftPinkyTipBbox")
+
 			leftTipBB = new Box3().setFromObject(leftTipBbox);
 
 			rightTipBB = new Box3().setFromObject(rightTipBbox);
 
 			rightMiddleTipBB = new Box3().setFromObject(rightMiddleTipBbox);
+
+			leftPinkyTipBB = new Box3().setFromObject(leftPinkyTipBbox);
 
 			bboxBB = new Box3().setFromObject(bbox);
 
@@ -84,9 +94,27 @@ export const HandBbox = () => {
 			}
 
 			if (
+				rightTipBB.intersectsBox(leftPinkyTipBB)
+			) {
+				if (lastPinkyIntersect === false) {
+					setLastPinkyIntersect(true);
+					if (globals.moveMode === "freemove") {
+						globals.moveMode = "off";
+						console.log("cancel mode freemove");
+					} else {
+						globals.moveMode = "freemove";
+						console.log("set mode freemove");
+					}
+				}
+			} else {
+				setLastPinkyIntersect(false);
+			}
+
+			if (
 				(leftTipBB.intersectsBox(bboxBB) || rightTipBB.intersectsBox(bboxBB)) &&
 				globals.moveMode !== "freecontrol" &&
-				globals.moveMode !== "bindhand"
+				globals.moveMode !== "bindhand" &&
+				globals.moveMode !== "freemove"
 			) {
 				globals.moveMode = "insideBbox";
 				console.log("xxx", globals.moveMode);
@@ -116,6 +144,10 @@ export const HandBbox = () => {
 			<mesh name="rightMiddleTipBbox" ref={rightMiddleTipRef}>
 				<boxGeometry args={[0.02, 0.02, 0.02]} />
 				<meshStandardMaterial color={"red"} transparent opacity={1} />
+			</mesh>
+			<mesh name="leftPinkyTipBbox" ref={leftPinkyTipRef}>
+				<boxGeometry args={[0.02, 0.02, 0.02]} />
+				<meshStandardMaterial color={"blue"} transparent opacity={1} />
 			</mesh>
 		</>
 	);
