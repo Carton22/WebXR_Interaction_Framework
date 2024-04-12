@@ -40,7 +40,7 @@ export function EnhancedRayGrab({
 			globals.moveMode == "insideBbox"
 		) {
 			if (controller1 && !controller2) {
-				if (globals.moveMode == "bbox") {
+				if (globals.moveMode == "bbox" || globals.moveMode == "insideBbox") {
 					// Handle translation and rotation for single controller
 					obj.applyMatrix4(previousTransform);
 					obj.applyMatrix4(controller1.matrixWorld);
@@ -67,8 +67,8 @@ export function EnhancedRayGrab({
 				}
 			} else if (
 				controller1 &&
-				controller2 &&
-				globals.moveMode == "insideBbox"
+				controller2 
+				// globals.moveMode == "insideBbox"
 			) {
 				// Handle scaling for two controllers
 				const currentDistance = controller1.position.distanceTo(

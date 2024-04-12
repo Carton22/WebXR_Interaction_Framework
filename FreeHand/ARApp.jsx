@@ -24,8 +24,8 @@ import { EnhancedRayGrab } from "./EnhancedRayGrab";
 import { HandBbox } from "./HandBbox";
 import { KeyboardControl } from "./KeyboardControl";
 
-// export let realityMode = "AR";
-export let realityMode = "VR";
+export let realityMode = "AR";
+// export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {

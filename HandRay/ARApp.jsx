@@ -21,8 +21,8 @@ import React from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
 
-// export let realityMode = "AR";
-export let realityMode = "VR";
+export let realityMode = "AR";
+// export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {
@@ -87,7 +87,7 @@ export default function App() {
 					<EnhancedRayGrab>
 						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 							<boxGeometry args={boxLength} />
-							<meshStandardMaterial color="skyblue" transparent opacity={0.8} />
+							<meshStandardMaterial color="skyblue" transparent opacity={1} />
 							<AxisPoints objScale={objScale} boxLength={boxLength} />
 						</mesh>
 					</EnhancedRayGrab>
