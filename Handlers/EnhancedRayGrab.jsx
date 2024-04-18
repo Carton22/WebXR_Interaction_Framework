@@ -20,8 +20,7 @@ function calculateAxis(startPoint, endPoint) {
 }
 
 export function EnhancedRayGrab({
-	onSelectStart,
-	onSelectEnd,
+	setPlayM,
 	children,
 	...rest
 }) {
@@ -139,6 +138,11 @@ export function EnhancedRayGrab({
 	const initialScale = useRef();
 
 	const handleSelectStart = (e) => {
+		setPlayM(true);
+		// only play the sound for once
+		setTimeout(() => {
+			setPlayM(false);
+		}, 500);
 		intersectedObj.current = e.intersection?.object;
 		console.log(
 			"intersectedObj",
@@ -181,7 +185,6 @@ export function EnhancedRayGrab({
 				controller1Ref.current = controller.controller;
 				previousTransform.copy(controller.controller.matrixWorld).invert();
 				// initialScale.current = intersectedObj.current?.scale.clone();
-				onSelectStart?.(e);
 			} else if (
 				controller2Ref.current === undefined &&
 				controller1Ref.current !== controller.controller
@@ -237,7 +240,6 @@ export function EnhancedRayGrab({
 				intersectedObj.current = undefined;
 				initialScale.current = undefined;
 				initialDistance.current = 0;
-				onSelectEnd?.(e);
 				if (globals.moveMode !== "measuring") {
 					globals.moveMode = "off";
 				}
@@ -298,7 +300,6 @@ export function EnhancedRayGrab({
 								globals.handIndex = -1;
 								console.log("here off 8");
 							}
-							onSelectEnd?.(e);
 						}
 					}
 					if (controllers[1].hand) {
@@ -339,7 +340,6 @@ export function EnhancedRayGrab({
 								globals.handIndex = -1;
 								console.log("here off 9");
 							}
-							onSelectEnd?.(e);
 						}
 					}
 				}

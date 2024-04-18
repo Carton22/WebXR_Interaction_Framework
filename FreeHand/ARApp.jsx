@@ -18,14 +18,14 @@ import {
 	PositionalAudio,
 	Edges,
 } from "@react-three/drei";
-import React from "react";
+import { React, useRef, useState, useEffect } from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
 import { HandBbox } from "./HandBbox";
 import { KeyboardControl } from "./KeyboardControl";
 
-export let realityMode = "AR";
-// export let realityMode = "VR";
+// export let realityMode = "AR";
+export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {
@@ -60,6 +60,9 @@ function HandDecorate() {
 export default function App() {
 	const boxLength = [1, 1, 1];
 	const objScale = [1, 1, 1];
+	const [playM, setPlayM] = useState(false);
+	const positionRef = useRef([0, 1.5, -2]);
+
 	return (
 		<div id="ThreeJs" style={{ width: "100%", height: "100%" }}>
 			<XRButton
@@ -87,7 +90,12 @@ export default function App() {
 					{lights}
 					<Controllers />
 					<Hands />
-					<EnhancedRayGrab>
+					<group position={positionRef.current}>
+						{playM && (
+							<PositionalAudio url="../bgm.mp3" autoplay distance={0.1} />
+						)}
+					</group>
+					<EnhancedRayGrab setPlayM={setPlayM}>
 						<KeyboardControl>
 							<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 								<Edges name="bboxEdges" color={"white"} />

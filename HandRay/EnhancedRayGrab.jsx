@@ -1,12 +1,12 @@
 import { useRef, useMemo } from "react";
 import { Object3D, Matrix4, Vector3 } from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Interactive, useXR } from "@react-three/xr";
 import { globals } from "./ARApp";
+import { PositionalAudio, AudioLoader, AudioListener } from "three";
 
 export function EnhancedRayGrab({
-	onSelectStart,
-	onSelectEnd,
+	setPlayM,
 	children,
 	...rest
 }) {
@@ -17,6 +17,7 @@ export function EnhancedRayGrab({
 
 	const initialDistance = useRef(0);
 	const previousTransform = useMemo(() => new Matrix4(), []);
+	const {camera} = useXR();
 
 	useFrame(() => {
 		const controller1 = controller1Ref.current;
@@ -29,7 +30,7 @@ export function EnhancedRayGrab({
 
 		if (globals.moveMode == "bbox") {
 			if (controller1 && !controller2 && !bothHands.current) {
-				console.log("ccc", controller1.matrixWorld);
+				// console.log("ccc", controller1.matrixWorld);
 				// Handle translation and rotation for single controller
 				obj.applyMatrix4(previousTransform);
 				obj.applyMatrix4(controller1.matrixWorld);
@@ -60,7 +61,13 @@ export function EnhancedRayGrab({
 	const intersectedObj = useRef();
 	const initialScale = useRef();
 	const handleSelectStart = (e) => {
+		setPlayM(true);
+		// only play the sound for once
+		setTimeout(() => {
+			setPlayM(false);
+		}, 500);
 		intersectedObj.current = e.intersection?.object;
+		console.log("kkk intersectedObj", intersectedObj.current);
 		console.log(
 			"intersectedObj",
 			intersectedObj.current.parent,
@@ -85,7 +92,6 @@ export function EnhancedRayGrab({
 				controller1Ref.current = controller.controller;
 				previousTransform.copy(controller.controller.matrixWorld).invert();
 				// initialScale.current = intersectedObj.current?.scale.clone();
-				onSelectStart?.(e);
 			} else if (
 				controller2Ref.current === undefined &&
 				controller1Ref.current !== controller.controller
@@ -141,7 +147,6 @@ export function EnhancedRayGrab({
 				intersectedObj.current = undefined;
 				initialScale.current = undefined;
 				initialDistance.current = 0;
-				onSelectEnd?.(e);
 				if (globals.moveMode !== "measuring") {
 					globals.moveMode = "off";
 				}
@@ -163,7 +168,7 @@ export function EnhancedRayGrab({
 					globals.moveMode == "bbox"
 				) {
 					if (controllers[0].hand) {
-						console.log("free release", globals.handIndex);
+						// console.log("free release", globals.handIndex);
 						if (
 							controllers[0].hand.inputState.pinching == false &&
 							globals.handIndex == 0
@@ -204,11 +209,10 @@ export function EnhancedRayGrab({
 								globals.handIndex = -1;
 								console.log("here off 8");
 							}
-							onSelectEnd?.(e);
 						}
 					}
 					if (controllers[1].hand) {
-						console.log("free release 2", globals.handIndex);
+						// console.log("free release 2", globals.handIndex);
 						if (
 							controllers[1].hand.inputState.pinching == false &&
 							globals.handIndex == 1
@@ -247,7 +251,6 @@ export function EnhancedRayGrab({
 								globals.handIndex = -1;
 								console.log("here off 9");
 							}
-							onSelectEnd?.(e);
 						}
 					}
 				}
