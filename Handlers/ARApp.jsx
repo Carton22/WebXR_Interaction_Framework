@@ -60,7 +60,7 @@ export default function App() {
 	const boxLength = [1, 1, 1];
 	const objScale = [1, 1, 1];
 	const [playM, setPlayM] = useState(false);
-	const positionRef = useRef([0, 1.5, -2]);
+	const [playE, setPlayE] = useState(false);
 	
 	return (
 		<div id="ThreeJs" style={{ width: "100%", height: "100%" }}>
@@ -89,18 +89,23 @@ export default function App() {
 					{lights}
 					<Controllers />
 					<Hands />
-					<group position={positionRef.current}>
-						{playM && (
-							<PositionalAudio url="../bgm.mp3" autoplay distance={0.1} />
-						)}
-					</group>
-					<EnhancedRayGrab setPlayM={setPlayM}>
-						<mesh name="bbox" position={positionRef.current} scale={objScale}>
+					<EnhancedRayGrab setPlayM={setPlayM} setPlayE={setPlayE}>
+						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 							<Edges name="bboxEdges" color={"white"} />
 							<boxGeometry args={boxLength} />
 							<meshStandardMaterial color="skyblue" transparent opacity={1} />
 							<AxisPoints objScale={objScale} boxLength={boxLength} />
 							<RotateHandlers objScale={objScale} boxLength={boxLength} />
+							<group position={[0, 0, 0]}>
+								{playM && (
+									<PositionalAudio url="../grab.MP3" autoplay distance={0.1} />
+								)}
+							</group>
+							<group position={[0, 1.5, -2]}>
+								{playE && (
+									<PositionalAudio url="../rel.MP3" autoplay distance={0.1} />
+								)}
+							</group>
 						</mesh>
 					</EnhancedRayGrab>
 					<HandDecorate />

@@ -7,6 +7,7 @@ import { PositionalAudio, AudioLoader, AudioListener } from "three";
 
 export function EnhancedRayGrab({
 	setPlayM,
+	setPlayE,
 	children,
 	...rest
 }) {
@@ -65,7 +66,7 @@ export function EnhancedRayGrab({
 		// only play the sound for once
 		setTimeout(() => {
 			setPlayM(false);
-		}, 500);
+		}, 150);
 		intersectedObj.current = e.intersection?.object;
 		console.log("kkk intersectedObj", intersectedObj.current);
 		console.log(
@@ -119,6 +120,11 @@ export function EnhancedRayGrab({
 	};
 
 	const handleSelectEnd = (e) => {
+		setPlayE(true);
+		// only play the sound for once
+		setTimeout(() => {
+			setPlayE(false);
+		}, 500);
 		if (
 			globals.moveMode == "bbox" ||
 			"insideHoldingPoint" ||

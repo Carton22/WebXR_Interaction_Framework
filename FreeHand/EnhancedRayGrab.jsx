@@ -7,6 +7,7 @@ import { Text, Center } from "@react-three/drei";
 
 export function EnhancedRayGrab({
 	setPlayM,
+	setPlayE,
 	children,
 	...rest
 }) {
@@ -153,7 +154,7 @@ export function EnhancedRayGrab({
 		// only play the sound for once
 		setTimeout(() => {
 			setPlayM(false);
-		}, 500);
+		}, 150);
 
 		intersectedObj.current = e.intersection?.object;
 		console.log(
@@ -203,6 +204,11 @@ export function EnhancedRayGrab({
 	};
 
 	const handleSelectEnd = (e) => {
+		setPlayE(true);
+		// only play the sound for once
+		setTimeout(() => {
+			setPlayE(false);
+		}, 500);
 		if (globals.moveMode == "bbox") {
 			const controller = e.target;
 			console.log("handleSelectEnd", controller.controller);
