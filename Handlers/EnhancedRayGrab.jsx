@@ -19,7 +19,15 @@ function calculateAxis(startPoint, endPoint) {
 	return axis;
 }
 
-export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
+export function EnhancedRayGrab({
+	setPlayM,
+	setPlayE,
+	setPlayMScroll,
+	setPlayMRotateHandler,
+	setPlayMHoldingPoint,
+	children,
+	...rest
+}) {
 	const controller1Ref = useRef();
 	const controller2Ref = useRef();
 	let bothHands = useRef(false);
@@ -69,11 +77,16 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 		if (globals.moveMode == "insideHoldingPoint") {
 			if (controller1) {
 				// Handle scaling for two controllers
-				const currentDistance = controller1.position.distanceTo(
-						bbox.position
-				);
+				const currentDistance = controller1.position.distanceTo(bbox.position);
 				if (initialDistance.current !== 0) {
 					const scale = currentDistance / initialDistance.current;
+					if (scale !== 1) {
+						setPlayMScroll(true);
+						// only play the sound for once
+						setTimeout(() => {
+							setPlayMScroll(false);
+						}, 15);
+					}
 					const initScale = initialScale.current;
 					bbox.scale.set(initScale.x, initScale.y, initScale.z);
 					bbox.scale.multiplyScalar(scale);
@@ -88,6 +101,13 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 					return;
 				}
 				deltaController.subVectors(controller1.position, previousControllerPos);
+				if (deltaController.lengthSq() > 0) {
+					setPlayMScroll(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMScroll(false);
+					}, 15);
+				}
 				console.log("ggggg", obj.parent);
 				const rotationSpeed = 3;
 				let startPointX = scene.getObjectByName("startPointX");
@@ -149,11 +169,6 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 	const initialScale = useRef();
 
 	const handleSelectStart = (e) => {
-		setPlayM(true);
-		// only play the sound for once
-		setTimeout(() => {
-			setPlayM(false);
-		}, 150);
 		intersectedObj.current = e.intersection?.object;
 		console.log(
 			"intersectedObj",
@@ -166,6 +181,11 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 		console.log("hard", intersectedObj.current.name);
 		if (intersectedObj.current.name === "bbox") {
 			globals.moveMode = "bbox";
+			setPlayM(true);
+			// only play the sound for once
+			setTimeout(() => {
+				setPlayM(false);
+			}, 150);
 		} else if (
 			(intersectedObj.current.name === "rotateHandler0" ||
 				intersectedObj.current.name === "rotateHandler1" ||
@@ -183,6 +203,11 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 		) {
 			// console.log("hihihihi");
 			globals.moveMode = "holdingRotateHandler";
+			setPlayMRotateHandler(true);
+			// only play the sound for once
+			setTimeout(() => {
+				setPlayMRotateHandler(false);
+			}, 300);
 		} else if (
 			(intersectedObj.current.name === "holdingPoint0" ||
 				intersectedObj.current.name === "holdingPoint1" ||
@@ -196,6 +221,11 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 		) {
 			// console.log("hihihihi");
 			globals.moveMode = "insideHoldingPoint";
+			setPlayMHoldingPoint(true);
+			// only play the sound for once
+			setTimeout(() => {
+				setPlayMHoldingPoint(false);
+			}, 300);
 		}
 		console.log("handleSelectStart");
 		if (
@@ -288,6 +318,11 @@ export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 					globals.moveMode == "insideBbox" ||
 					globals.moveMode == "bbox"
 				) {
+					// setPlayE(true);
+					// // only play the sound for once
+					// setTimeout(() => {
+					// 	setPlayE(false);
+					// }, 500);
 					if (controllers[0].hand) {
 						console.log("free release", globals.handIndex);
 						if (

@@ -1,10 +1,5 @@
 import { Canvas, events, useFrame, useThree } from "@react-three/fiber";
-import {
-	XRButton,
-	XR,
-	Hands,
-	useXR,
-} from "@react-three/xr";
+import { XRButton, XR, Hands, useXR } from "@react-three/xr";
 import { Controllers } from "./react-xr/Controller";
 import { BackSide, DoubleSide, Vector3 } from "three";
 import {
@@ -58,7 +53,10 @@ export default function App() {
 	const objScale = [1, 1, 1];
 	const [playM, setPlayM] = useState(false);
 	const [playE, setPlayE] = useState(false);
-	
+	const [PlayMScroll, setPlayMScroll] = useState(false);
+	const [PlayMRotateHandler, setPlayMRotateHandler] = useState(false);
+	const [PlayMHoldingPoint, setPlayMHoldingPoint] = useState(false);
+
 	return (
 		<div id="ThreeJs" style={{ width: "100%", height: "100%" }}>
 			<XRButton
@@ -86,7 +84,13 @@ export default function App() {
 					{lights}
 					<Controllers />
 					<Hands />
-					<EnhancedRayGrab setPlayM={setPlayM} setPlayE={setPlayE}>
+					<EnhancedRayGrab
+						setPlayM={setPlayM}
+						setPlayE={setPlayE}
+						setPlayMScroll={setPlayMScroll}
+						setPlayMRotateHandler={setPlayMRotateHandler}
+						setPlayMHoldingPoint={setPlayMHoldingPoint}
+					>
 						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 							<Edges name="bboxEdges" color={"white"} />
 							<boxGeometry args={boxLength} />
@@ -99,9 +103,28 @@ export default function App() {
 									<PositionalAudio url="../grab.MP3" autoplay distance={0.1} />
 								)}
 							</group>
-							<group position={[0, 1.5, -2]}>
+							<group position={[0, 0, 0]}>
 								{playE && (
 									<PositionalAudio url="../rel.MP3" autoplay distance={0.1} />
+								)}
+							</group>
+							<group position={[0, 0, 0]}>
+								{PlayMRotateHandler && (
+									<PositionalAudio url="../press.MP3" autoplay distance={0.1} />
+								)}
+							</group>
+							<group position={[0, 0, 0]}>
+								{PlayMScroll && (
+									<PositionalAudio url="../scroll.MP3" autoplay loop distance={0.1} />
+								)}
+							</group>
+							<group position={[0, 0, 0]}>
+								{PlayMHoldingPoint && (
+									<PositionalAudio
+										url="../activate.MP3"
+										autoplay
+										distance={0.1}
+									/>
 								)}
 							</group>
 						</mesh>
