@@ -3,10 +3,6 @@ import {
 	XRButton,
 	XR,
 	Hands,
-	Interactive,
-	ARButton,
-	VRButton,
-	RayGrab,
 	useXR,
 } from "@react-three/xr";
 import { Controllers } from "./react-xr/Controller";
@@ -22,6 +18,7 @@ import { React, useRef, useState, useEffect } from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
 import { RotateHandlers } from "./RotateHandlers";
+import { HoldingPoints } from "./HoldingPoints";
 
 // export let realityMode = "AR";
 export let realityMode = "VR";
@@ -96,6 +93,7 @@ export default function App() {
 							<meshStandardMaterial color="skyblue" transparent opacity={1} />
 							<AxisPoints objScale={objScale} boxLength={boxLength} />
 							<RotateHandlers objScale={objScale} boxLength={boxLength} />
+							<HoldingPoints objScale={objScale} boxLength={boxLength} />
 							<group position={[0, 0, 0]}>
 								{playM && (
 									<PositionalAudio url="../grab.MP3" autoplay distance={0.1} />

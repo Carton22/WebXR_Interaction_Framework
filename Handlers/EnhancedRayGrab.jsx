@@ -19,16 +19,12 @@ function calculateAxis(startPoint, endPoint) {
 	return axis;
 }
 
-export function EnhancedRayGrab({
-	setPlayM,
-	setPlayE,
-	children,
-	...rest
-}) {
+export function EnhancedRayGrab({ setPlayM, setPlayE, children, ...rest }) {
 	const controller1Ref = useRef();
 	const controller2Ref = useRef();
 	let bothHands = useRef(false);
 	const { scene } = useThree();
+	let bbox = scene.getObjectByName("bbox");
 
 	const initialDistance = useRef(0);
 	const previousTransform = useMemo(() => new Matrix4(), []);
@@ -67,6 +63,21 @@ export function EnhancedRayGrab({
 				const initScale = initialScale.current;
 				obj.scale.set(initScale.x, initScale.y, initScale.z);
 				obj.scale.multiplyScalar(scale);
+			}
+		}
+
+		if (globals.moveMode == "insideHoldingPoint") {
+			if (controller1) {
+				// Handle scaling for two controllers
+				const currentDistance = controller1.position.distanceTo(
+						bbox.position
+				);
+				if (initialDistance.current !== 0) {
+					const scale = currentDistance / initialDistance.current;
+					const initScale = initialScale.current;
+					bbox.scale.set(initScale.x, initScale.y, initScale.z);
+					bbox.scale.multiplyScalar(scale);
+				}
 			}
 		}
 
@@ -128,7 +139,6 @@ export function EnhancedRayGrab({
 
 				let angle = deltaController.length() * rotationSpeed;
 				let quaternion = new Quaternion().setFromAxisAngle(rotateAxis, angle);
-				let bbox = scene.getObjectByName("bbox");
 				bbox.applyQuaternion(quaternion);
 				previousControllerPos.copy(controller1.position);
 			}
@@ -173,6 +183,19 @@ export function EnhancedRayGrab({
 		) {
 			// console.log("hihihihi");
 			globals.moveMode = "holdingRotateHandler";
+		} else if (
+			(intersectedObj.current.name === "holdingPoint0" ||
+				intersectedObj.current.name === "holdingPoint1" ||
+				intersectedObj.current.name === "holdingPoint2" ||
+				intersectedObj.current.name === "holdingPoint3" ||
+				intersectedObj.current.name === "holdingPoint4" ||
+				intersectedObj.current.name === "holdingPoint5" ||
+				intersectedObj.current.name === "holdingPoint6" ||
+				intersectedObj.current.name === "holdingPoint7") &&
+			globals.moveMode !== "insideBbox"
+		) {
+			// console.log("hihihihi");
+			globals.moveMode = "insideHoldingPoint";
 		}
 		console.log("handleSelectStart");
 		if (
@@ -201,10 +224,9 @@ export function EnhancedRayGrab({
 					);
 				}
 			} else if (globals.moveMode == "insideHoldingPoint") {
-				initialScale.current =
-					intersectedObj.current?.parent.parent.scale.clone();
+				initialScale.current = bbox.scale.clone();
 				initialDistance.current = controller.controller.position.distanceTo(
-					intersectedObj.current.parent.parent.position
+					bbox.position
 				);
 			} else if (globals.moveMode == "holdingRotateHandler") {
 				previousControllerPos.copy(controller.controller.position);

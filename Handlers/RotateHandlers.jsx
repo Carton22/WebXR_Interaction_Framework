@@ -1,4 +1,4 @@
-export function RotateHandlers({objScale, boxLength}){
+export function RotateHandlers({ objScale, boxLength }) {
 	return (
 		<>
 			{/* x axis 4 boxes */}
