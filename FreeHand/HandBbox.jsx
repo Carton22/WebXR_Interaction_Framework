@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { globals } from "./ARApp";
 import { Box3 } from "three";
+import { PositionalAudio } from "@react-three/drei";
 
 export const HandBbox = () => {
 	const { controllers } = useXR();
@@ -19,6 +20,9 @@ export const HandBbox = () => {
 	let [lastIntersect, setLastIntersect] = useState(false);
 	let [lastMiddleIntersect, setLastMiddleIntersect] = useState(false);
 	let [lastPinkyIntersect, setLastPinkyIntersect] = useState(false);
+
+	let [PlayMFreeHand, setPlayMFreeHand] = useState(false);
+	let [PlayMPress, setPlayMPress] = useState(false);
 
 	useFrame(() => {
 		if (controllers && controllers[0] && controllers[1]) {
@@ -45,8 +49,8 @@ export const HandBbox = () => {
 			// console.log("leftTipBbox", leftTipBbox);
 			let bbox = scene.getObjectByName("bbox");
 
-			let rightMiddleTipBbox = scene.getObjectByName("rightMiddleTipBbox")
-			let leftPinkyTipBbox = scene.getObjectByName("leftPinkyTipBbox")
+			let rightMiddleTipBbox = scene.getObjectByName("rightMiddleTipBbox");
+			let leftPinkyTipBbox = scene.getObjectByName("leftPinkyTipBbox");
 
 			leftTipBB = new Box3().setFromObject(leftTipBbox);
 
@@ -63,6 +67,11 @@ export const HandBbox = () => {
 				leftTipBB.max.x !== -rightTipBB.min.x
 			) {
 				if (lastIntersect === false) {
+					setPlayMFreeHand(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMFreeHand(false);
+					}, 500);
 					setLastIntersect(true);
 					if (globals.moveMode === "freecontrol") {
 						globals.moveMode = "off";
@@ -76,10 +85,13 @@ export const HandBbox = () => {
 				setLastIntersect(false);
 			}
 
-			if (
-				leftTipBB.intersectsBox(rightMiddleTipBB)
-			) {
+			if (leftTipBB.intersectsBox(rightMiddleTipBB)) {
 				if (lastMiddleIntersect === false) {
+					setPlayMPress(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMPress(false);
+					}, 300);
 					setLastMiddleIntersect(true);
 					if (globals.moveMode === "bindhand") {
 						globals.moveMode = "off";
@@ -93,10 +105,13 @@ export const HandBbox = () => {
 				setLastMiddleIntersect(false);
 			}
 
-			if (
-				rightTipBB.intersectsBox(leftPinkyTipBB)
-			) {
+			if (rightTipBB.intersectsBox(leftPinkyTipBB)) {
 				if (lastPinkyIntersect === false) {
+					setPlayMPress(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMPress(false);
+					}, 300);
 					setLastPinkyIntersect(true);
 					if (globals.moveMode === "freemove") {
 						globals.moveMode = "off";
@@ -134,20 +149,30 @@ export const HandBbox = () => {
 	return (
 		<>
 			<mesh name="leftTipBbox" ref={leftTipRef}>
-				<boxGeometry args={[0.02, 0.02, 0.02]} />
-				<meshStandardMaterial color={"green"} transparent opacity={1} />
+				<sphereGeometry args={[0.01]} />
+				<meshStandardMaterial color={"red"} transparent opacity={0.7} />
+				<group position={[0, 0, 0]}>
+					{PlayMFreeHand && (
+						<PositionalAudio url="../activate.MP3" autoplay distance={0.1} />
+					)}
+				</group>
+				<group position={[0, 0, 0]}>
+					{PlayMPress && (
+						<PositionalAudio url="../press.MP3" autoplay distance={0.1} />
+					)}
+				</group>
 			</mesh>
 			<mesh name="rightTipBbox" ref={rightTipRef}>
-				<boxGeometry args={[0.02, 0.02, 0.02]} />
-				<meshStandardMaterial color={"orange"} transparent opacity={1} />
+				<sphereGeometry args={[0.01]} />
+				<meshStandardMaterial color={"blue"} transparent opacity={0.7} />
 			</mesh>
 			<mesh name="rightMiddleTipBbox" ref={rightMiddleTipRef}>
-				<boxGeometry args={[0.02, 0.02, 0.02]} />
-				<meshStandardMaterial color={"red"} transparent opacity={1} />
+				<sphereGeometry args={[0.01]} />
+				<meshStandardMaterial color={"red"} transparent opacity={0.7} />
 			</mesh>
 			<mesh name="leftPinkyTipBbox" ref={leftPinkyTipRef}>
-				<boxGeometry args={[0.02, 0.02, 0.02]} />
-				<meshStandardMaterial color={"blue"} transparent opacity={1} />
+				<sphereGeometry args={[0.01]} />
+				<meshStandardMaterial color={"blue"} transparent opacity={0.7} />
 			</mesh>
 		</>
 	);

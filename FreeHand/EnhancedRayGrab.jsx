@@ -8,6 +8,7 @@ import { Text, Center } from "@react-three/drei";
 export function EnhancedRayGrab({
 	setPlayM,
 	setPlayE,
+	setPlayMScroll,
 	children,
 	...rest
 }) {
@@ -53,7 +54,7 @@ export function EnhancedRayGrab({
 				} else if (globals.moveMode == "bindhand") {
 					// Get the current quaternion of the controller
 					const currentControllerQuaternion = controller1.quaternion;
-
+					
 					// Calculate the change in rotation since the last frame
 					const deltaRotationQuaternion = new Quaternion();
 					deltaRotationQuaternion
@@ -84,7 +85,16 @@ export function EnhancedRayGrab({
 					const moveSpeed = 500;
 					let moveDistance =
 						deltaMoveDistance.length() * deltaMoveDistance.length() * moveSpeed;
-					let moveVector = new Vector3().copy(direction).multiplyScalar(moveDistance);
+						if (moveDistance > 0) {
+							setPlayMScroll(true);
+							// only play the sound for once
+							setTimeout(() => {
+								setPlayMScroll(false);
+							}, 15);
+						}
+					let moveVector = new Vector3()
+						.copy(direction)
+						.multiplyScalar(moveDistance);
 					console.log("moveVector", moveVector);
 					console.log("before bbox position", bbox.position);
 					bbox.position.add(moveVector);
@@ -126,6 +136,13 @@ export function EnhancedRayGrab({
 				const rotationSpeed = 500;
 				let angle =
 					deltaController.length() * deltaController.length() * rotationSpeed;
+				if (angle > 0) {
+					setPlayMScroll(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMScroll(false);
+					}, 15);
+				}
 				console.log("angle", deltaController.length());
 				let quaternion = new Quaternion().setFromAxisAngle(normal, angle);
 				bbox.applyQuaternion(quaternion);
@@ -139,6 +156,13 @@ export function EnhancedRayGrab({
 					initialDistance.current = currentDistance;
 				}
 				const scale = currentDistance / initialDistance.current;
+				if (scale !== 1) {
+					setPlayMScroll(true);
+					// only play the sound for once
+					setTimeout(() => {
+						setPlayMScroll(false);
+					}, 15);
+				}
 				const initScale = initialScale.current;
 				obj.scale.set(initScale.x, initScale.y, initScale.z);
 				obj.scale.multiplyScalar(scale);
@@ -424,6 +448,14 @@ export function EnhancedRayGrab({
 		});
 	};
 
+	const fontProps = {
+		font: "/Inter-Bold.woff",
+		fontSize: 2.5,
+		letterSpacing: -0.05,
+		lineHeight: 1,
+		"material-toneMapped": true,
+	};
+
 	return (
 		<>
 			<Interactive
@@ -435,8 +467,8 @@ export function EnhancedRayGrab({
 				<ReleaseSelectEndHandler />
 				{children}
 			</Interactive>
-			<Center bottom right position={[0, 2, -1]}>
-				<Text name="result" color="gray" scale={0.05}>
+			<Center bottom right position={[0, 2.2, -1]}>
+				<Text name="result" color="orange" scale={0.05} {...fontProps}>
 					{`${t}`}
 				</Text>
 			</Center>

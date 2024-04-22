@@ -14,7 +14,6 @@ import { BackSide, DoubleSide, Vector3 } from "three";
 import {
 	OrbitControls,
 	Sky,
-	useGLTF,
 	PositionalAudio,
 	Edges,
 } from "@react-three/drei";
@@ -62,6 +61,7 @@ export default function App() {
 	const objScale = [1, 1, 1];
 	const [playM, setPlayM] = useState(false);
 	const [playE, setPlayE] = useState(false);
+	const [PlayMScroll, setPlayMScroll] = useState(false);
 
 	return (
 		<div id="ThreeJs" style={{ width: "100%", height: "100%" }}>
@@ -90,12 +90,7 @@ export default function App() {
 					{lights}
 					<Controllers />
 					<Hands />
-					<group position={positionRef.current}>
-						{playM && (
-							<PositionalAudio url="../bgm.mp3" autoplay distance={0.1} />
-						)}
-					</group>
-					<EnhancedRayGrab setPlayM={setPlayM} setPlayE={setPlayE}>
+					<EnhancedRayGrab setPlayM={setPlayM} setPlayE={setPlayE} setPlayMScroll={setPlayMScroll}>
 						<KeyboardControl>
 							<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
 								<Edges name="bboxEdges" color={"white"} />
@@ -115,11 +110,16 @@ export default function App() {
 										/>
 									)}
 								</group>
-								<group position={[0, 1.5, -2]}>
+								<group position={[0, 0, 0]}>
 									{playE && (
 										<PositionalAudio url="../rel.MP3" autoplay distance={0.1} />
 									)}
 								</group>
+								<group position={[0, 0, 0]}>
+								{PlayMScroll && (
+									<PositionalAudio url="../scroll.MP3" autoplay loop distance={0.1} />
+								)}
+							</group>
 							</mesh>
 						</KeyboardControl>
 					</EnhancedRayGrab>
