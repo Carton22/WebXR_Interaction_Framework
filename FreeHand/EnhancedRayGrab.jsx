@@ -54,7 +54,7 @@ export function EnhancedRayGrab({
 				} else if (globals.moveMode == "bindhand") {
 					// Get the current quaternion of the controller
 					const currentControllerQuaternion = controller1.quaternion;
-					
+
 					// Calculate the change in rotation since the last frame
 					const deltaRotationQuaternion = new Quaternion();
 					deltaRotationQuaternion
@@ -85,13 +85,13 @@ export function EnhancedRayGrab({
 					const moveSpeed = 500;
 					let moveDistance =
 						deltaMoveDistance.length() * deltaMoveDistance.length() * moveSpeed;
-						if (moveDistance > 0) {
-							setPlayMScroll(true);
-							// only play the sound for once
-							setTimeout(() => {
-								setPlayMScroll(false);
-							}, 15);
-						}
+					// if (moveDistance > 0) {
+					// 	setPlayMScroll(true);
+					// 	// only play the sound for once
+					// 	setTimeout(() => {
+					// 		setPlayMScroll(false);
+					// 	}, 150);
+					// }
 					let moveVector = new Vector3()
 						.copy(direction)
 						.multiplyScalar(moveDistance);
@@ -136,13 +136,13 @@ export function EnhancedRayGrab({
 				const rotationSpeed = 500;
 				let angle =
 					deltaController.length() * deltaController.length() * rotationSpeed;
-				if (angle > 0) {
-					setPlayMScroll(true);
-					// only play the sound for once
-					setTimeout(() => {
-						setPlayMScroll(false);
-					}, 15);
-				}
+				// if (angle > 0) {
+				// 	setPlayMScroll(true);
+				// 	// only play the sound for once
+				// 	setTimeout(() => {
+				// 		setPlayMScroll(false);
+				// 	}, 150);
+				// }
 				console.log("angle", deltaController.length());
 				let quaternion = new Quaternion().setFromAxisAngle(normal, angle);
 				bbox.applyQuaternion(quaternion);
@@ -156,13 +156,13 @@ export function EnhancedRayGrab({
 					initialDistance.current = currentDistance;
 				}
 				const scale = currentDistance / initialDistance.current;
-				if (scale !== 1) {
-					setPlayMScroll(true);
-					// only play the sound for once
-					setTimeout(() => {
-						setPlayMScroll(false);
-					}, 15);
-				}
+				// if (scale !== 1) {
+				// 	setPlayMScroll(true);
+				// 	// only play the sound for once
+				// 	setTimeout(() => {
+				// 		setPlayMScroll(false);
+				// 	}, 150);
+				// }
 				const initScale = initialScale.current;
 				obj.scale.set(initScale.x, initScale.y, initScale.z);
 				obj.scale.multiplyScalar(scale);
@@ -174,12 +174,6 @@ export function EnhancedRayGrab({
 	const initialScale = useRef();
 
 	const handleSelectStart = (e) => {
-		setPlayM(true);
-		// only play the sound for once
-		setTimeout(() => {
-			setPlayM(false);
-		}, 150);
-
 		intersectedObj.current = e.intersection?.object;
 		console.log(
 			"intersectedObj",
@@ -201,6 +195,11 @@ export function EnhancedRayGrab({
 
 		console.log("handleSelectStart");
 		if (globals.moveMode == "bbox") {
+			setPlayM(true);
+			// only play the sound for once
+			setTimeout(() => {
+				setPlayM(false);
+			}, 150);
 			const controller = e.target;
 			// Determine if it's the first or second controller
 			if (controller1Ref.current === undefined) {

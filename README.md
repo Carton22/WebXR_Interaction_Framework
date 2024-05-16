@@ -3,7 +3,7 @@ bring your display into the WebXR session, and enable truly fast iteration.
 
 ### Prerequisite
 
-When you test this project, please make sure your computer and the HMD device are connected to the same WiFi
+When you test this project, please make sure your computer and the HMD device are connected to the same WiFi. You can try to connect it to the same UMN Wifi. Or you can also try to open hotspot data from your phone and connect both your laptop and the headset to it.
 
 ### Setup
 
@@ -23,18 +23,13 @@ then you will see the terminal output like this
 
 ![terminal](images/terminal.png)
 
-### Stream
+### How to open in the headset?
 
-1. Choose one of the network url (e.g. https://10.186.210.189:10086/)
+1. Choose one of the `Network` URLs (e.g. https://10.186.210.189:10086/)
 2. Open https://10.186.210.189:10086/ in Meta Quest Browser
-3. Run https://10.186.210.189:10086/stream.html on your desktop
-4. (Optional) run https://10.186.210.189:10086/desktop.html on your desktop
-5. In `stream.html`, connect and stream the webpage you choose
-6. In HMD, click `enter AR` button
-7. Now you can enjoy this fantastic application🎉
-8. Aim at the target point on the screen, pinch your hand, then you will see the emerging object.
-
-⚠️ **Warning**: Please do not open https://10.186.210.189:10086/ in desktop and HMD simultaneously
+3. In HMD, click `enter AR` button
+4. Now you can enjoy this fantastic application🎉
+5. Above is one default webxr application. You can also open `URL/handlers.html` (e.g.  https://10.186.210.189:10086/handlers.html) or  URL/freehand.html(e.g.  https://10.186.210.189:10086/freehand.html), then it will launch the corresponding webxr application.
 
 ### Feature
 
@@ -54,17 +49,11 @@ This project includes a simple 3D scene to provide some context when demonstrati
 
 The key files implementing the remote display logic are:
 
-- `vite.config.ts`, where message passing is configured
-- `stream.html`, a single-file JavaScript app loaded by the dev machine
-- `src\connectRemoteDisplay.ts`, logic on the immersive app side for connecting to
-  the WebRTC stream
-- `src\RemoteDisplay.tsx`, a React component rendering the display in the WebXR
-  session
-- `src\TwoHandScale.tsx`, define the object manipulation logic
-- `src\RetriveObject.tsx`, deal with the object emerging
-- `src\Holodeck.tsx`, define the black and yellow VR background
+- `EnhancedRayGrab.jsx`, define all the hand interaction and the object manipulation logic
 
 ‼️To quickly understand the framework and structure of this project, I recommend looking at `src\ARApp.tsx` first.
+
+If you still have more questions, feel free to ask me directly in Slack.😊
 
 
 

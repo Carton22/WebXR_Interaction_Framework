@@ -151,7 +151,7 @@ export const HandBbox = () => {
 			<mesh name="leftTipBbox" ref={leftTipRef}>
 				<sphereGeometry args={[0.01]} />
 				<meshStandardMaterial color={"red"} transparent opacity={0.7} />
-				<group position={[0, 0, 0]}>
+				{/* <group position={[0, 0, 0]}>
 					{PlayMFreeHand && (
 						<PositionalAudio url="../activate.MP3" autoplay distance={0.1} />
 					)}
@@ -160,7 +160,7 @@ export const HandBbox = () => {
 					{PlayMPress && (
 						<PositionalAudio url="../press.MP3" autoplay distance={0.1} />
 					)}
-				</group>
+				</group> */}
 			</mesh>
 			<mesh name="rightTipBbox" ref={rightTipRef}>
 				<sphereGeometry args={[0.01]} />

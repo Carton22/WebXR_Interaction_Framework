@@ -11,9 +11,10 @@ import {
 import { React, useRef, useState, useEffect } from "react";
 import { AxisPoints } from "./AxisPoints";
 import { EnhancedRayGrab } from "./EnhancedRayGrab";
+import config from "./config.json";
 
-// export let realityMode = "AR";
-export let realityMode = "VR";
+export let realityMode = "AR";
+// export let realityMode = "VR";
 export let globals = { moveMode: "off", handIndex: -1 };
 
 function HandDecorate() {
@@ -46,8 +47,6 @@ function HandDecorate() {
 }
 
 export default function App() {
-	const boxLength = [1, 1, 1];
-	const objScale = [1, 1, 1];
 	const [playM, setPlayM] = useState(false);
 	const [playE, setPlayE] = useState(false);
 
@@ -79,10 +78,23 @@ export default function App() {
 					<Controllers />
 					<Hands />
 					<EnhancedRayGrab setPlayM={setPlayM} setPlayE={setPlayE}>
-						<mesh name="bbox" position={[0, 1.5, -2]} scale={objScale}>
-							<boxGeometry args={boxLength} />
+						<mesh
+							name="bbox"
+							position={config.bboxPosition}
+							scale={config.objScale}
+							// onClick={(e) => {
+							// 	// Example: Move the object to a new random position
+							// 	console.log("on click", e.target.name);
+							// 	const newConfig = { ...config, bboxPosition: e.target.position };
+							// 	localStorage.setItem("config", JSON.stringify(newConfig));
+							// }}
+						>
+							<boxGeometry args={config.boxLength} />
 							<meshStandardMaterial color="skyblue" transparent opacity={1} />
-							<AxisPoints objScale={objScale} boxLength={boxLength} />
+							<AxisPoints
+								objScale={config.objScale}
+								boxLength={config.boxLength}
+							/>
 							<group position={[0, 0, 0]}>
 								{playM && (
 									<PositionalAudio url="../grab.MP3" autoplay distance={0.1} />
