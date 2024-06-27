@@ -5,7 +5,10 @@ export default function useKeyboard() {
 
   useEffect(() => {
     const onDocumentKey = (e) => {
+      // if keydown, true
+      // if keyup, false
       keyMap.current[e.code] = e.type === 'keydown'
+      // do something here according to keyMap.current
       console.log(e.code)
     }
     document.addEventListener('keydown', onDocumentKey)
