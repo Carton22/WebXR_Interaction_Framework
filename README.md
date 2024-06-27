@@ -53,7 +53,7 @@ The key files implementing the remote display logic are:
 
 If you still have more questions, feel free to contact me.😊
 
-### WIsh for more stars🌟! 
+### Wish for more stars🌟! 
 
 Thank you!
 
